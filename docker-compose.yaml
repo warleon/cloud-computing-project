@@ -1,0 +1,45 @@
+services:
+  ms1:
+    build:
+      context: ./cloud-computing-project-ms-1
+      dockerfile: Dockerfile
+    image: warleon/cloud-computing-project-ms-1:latest
+    container_name: ms1
+    ports:
+      - "5001:5000" # adjust ports as needed
+
+  ms2:
+    build:
+      context: ./cloud-computing-project-ms-2
+      dockerfile: Dockerfile
+    image: warleon/cloud-computing-project-ms-2:latest
+    container_name: ms2
+    ports:
+      - "5002:5000"
+
+  ms3:
+    build:
+      context: ./cloud-computing-project-ms-3
+      dockerfile: Dockerfile
+    image: warleon/cloud-computing-project-ms-3:latest
+    container_name: ms3
+    ports:
+      - "5003:5000"
+
+  ms4:
+    build:
+      context: ./cloud-computing-project-ms-4
+      dockerfile: Dockerfile
+    image: warleon/cloud-computing-project-ms-4:latest
+    container_name: ms4
+    ports:
+      - "5004:5000"
+
+  ms5:
+    build:
+      context: ./cloud-computing-project-ms-5
+      dockerfile: Dockerfile
+    image: warleon/cloud-computing-project-ms-5:latest
+    container_name: ms5
+    ports:
+      - "5005:5000"

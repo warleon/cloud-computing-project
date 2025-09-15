@@ -1,0 +1,15 @@
+[submodule "cloud-computing-project-ms-1"]
+	path = cloud-computing-project-ms-1
+	url = https://github.com/warleon/cloud-computing-project-ms-1.git
+[submodule "cloud-computing-project-ms-2"]
+	path = cloud-computing-project-ms-2
+	url = https://github.com/warleon/cloud-computing-project-ms-2.git
+[submodule "cloud-computing-project-ms-3"]
+	path = cloud-computing-project-ms-3
+	url = https://github.com/warleon/cloud-computing-project-ms-3.git
+[submodule "cloud-computing-project-ms-4"]
+	path = cloud-computing-project-ms-4
+	url = https://github.com/warleon/cloud-computing-project-ms-4.git
+[submodule "cloud-computing-project-ms-5"]
+	path = cloud-computing-project-ms-5
+	url = https://github.com/warleon/cloud-computing-project-ms-5.git

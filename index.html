@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Live Mermaid Editor with Persistence</title>
+    <style>
+      body {
+        display: flex;
+        gap: 1rem;
+        height: 100vh;
+        margin: 0;
+        font-family: sans-serif;
+      }
+      textarea {
+        width: 40%;
+        padding: 0.5rem;
+        font-family: monospace;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        resize: none;
+      }
+      #preview {
+        flex: 1;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 1rem;
+        overflow: auto;
+        background: #fafafa;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="editor"></textarea>
+    <div id="preview"></div>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+      const editor = document.getElementById("editor");
+      const preview = document.getElementById("preview");
+      const STORAGE_KEY = "mermaid-code";
+
+      // Load saved code from localStorage or fallback to default
+      const defaultCode = `graph TD
+  A[Client] --> B[Load Balancer]
+  B --> C[Server1]
+  B --> D[Server2]
+  C --> F`;
+
+      editor.value = localStorage.getItem(STORAGE_KEY) || defaultCode;
+
+      async function render() {
+        try {
+          // Save code in localStorage
+          localStorage.setItem(STORAGE_KEY, editor.value);
+
+          // Render diagram
+          const { svg } = await mermaid.render("graphDiv", editor.value);
+          preview.innerHTML = svg;
+        } catch (e) {
+          preview.innerHTML =
+            "<pre style='color:red'>Error:\n" + e.message + "</pre>";
+        }
+      }
+
+      editor.addEventListener("input", render);
+
+      mermaid.registerIconPacks([
+        {
+          name: "logos",
+          loader: () =>
+            fetch("https://unpkg.com/@iconify-json/logos@1/icons.json").then(
+              (res) => res.json()
+            ),
+        },
+      ]);
+      mermaid.initialize({ startOnLoad: false });
+      render(); // initial render
+    </script>
+  </body>
+</html>

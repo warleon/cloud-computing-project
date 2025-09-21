@@ -1,4 +1,4 @@
-# cloud-computing-project
+# Banking Platform
 
 ## Commit inside each submodule
 

@@ -6,7 +6,9 @@ services:
     image: warleon/cloud-computing-project-ms-1:latest
     container_name: ms1
     ports:
-      - "5001:5000" # adjust ports as needed
+      - "5001:3000" # adjust ports as needed
+    profiles:
+      - ms1
 
   ms2:
     build:
@@ -15,7 +17,9 @@ services:
     image: warleon/cloud-computing-project-ms-2:latest
     container_name: ms2
     ports:
-      - "5002:5000"
+      - "5002:3000"
+    profiles:
+      - ms2
 
   ms3:
     build:
@@ -24,7 +28,9 @@ services:
     image: warleon/cloud-computing-project-ms-3:latest
     container_name: ms3
     ports:
-      - "5003:5000"
+      - "5003:3000"
+    profiles:
+      - ms3
 
   ms4:
     build:
@@ -33,7 +39,9 @@ services:
     image: warleon/cloud-computing-project-ms-4:latest
     container_name: ms4
     ports:
-      - "5004:5000"
+      - "5004:3000"
+    profiles:
+      - ms4
 
   ms5:
     build:
@@ -42,4 +50,21 @@ services:
     image: warleon/cloud-computing-project-ms-5:latest
     container_name: ms5
     ports:
-      - "5005:5000"
+      - "5005:3000"
+    profiles:
+      - ms5
+
+  mysql:
+    image: mysql:8.0
+    environment:
+    MYSQL_ROOT_PASSWORD: secret
+    MYSQL_DATABASE: compliance
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    profiles:
+      - ms4
+
+volumes:
+  mysql-data:

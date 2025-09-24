@@ -37,11 +37,30 @@ services:
       context: ./cloud-computing-project-ms-4
       dockerfile: Dockerfile
     image: warleon/cloud-computing-project-ms-4:latest
+    environment:
+      DB_PASSWORD: ${MS4_DB_ROOT_PASSWORD}
+      DB_NAME: ${MS4_DB_ROOT_DB}
+      DB_USER: root
+      DB_PORT: 3306
+      DB_HOST: ${MS4_DB_HOST:-mysql}
+      FRAUD_API_URL: ${MS4_PUBLIC_URL:-ms4}
+      GIN_MODE: release
     container_name: ms4
     ports:
-      - "5004:3000"
+      - "5004:8080"
+    healthcheck:
+      test: ["CMD", "wget", "http://localhost:8080/"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     profiles:
       - ms4
+    networks:
+      - ms4
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   ms5:
     build:
@@ -57,14 +76,36 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-    MYSQL_ROOT_PASSWORD: secret
-    MYSQL_DATABASE: compliance
+      MYSQL_ROOT_PASSWORD: ${MS4_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MS4_DB_ROOT_DB}
     ports:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     profiles:
       - ms4
+      - ms4-dev
+    networks:
+      - ms4
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
 volumes:
   mysql-data:
+
+networks:
+  ms4:
+    driver: bridge

@@ -1,10 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "CloudFormation: ALB + EC2 (MV1, MV2, DB, Ingesta) with Docker Compose"
+Description: "CloudFormation: ALB + EC2 (MV1, MV2, DB, Ingesta) with Docker Compose, spread across 2 AZs"
 
 Parameters:
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
-    Description: KeyPair name to access the EC2 instances
+    Description: Nombre del KeyPair para acceder a las instancias
+
   InstanceType:
     Type: String
     Default: t3.micro
@@ -12,19 +13,26 @@ Parameters:
       - t2.micro
       - t3.micro
       - t3.small
-    Description: EC2 instance type
+      - t3.medium
+    Description: Tipo de instancia EC2
+
   VpcId:
     Type: AWS::EC2::VPC::Id
-    Description: Existing VPC ID
-  Subnets:
-    Type: List<AWS::EC2::Subnet::Id>
-    Description: At least 2 public subnets in different Availability Zones
+    Description: VPC existente donde desplegar
+
+  AvailabilityZone1:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Description: Primera AZ para alta disponibilidad
+
+  AvailabilityZone2:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Description: Segunda AZ para alta disponibilidad
 
 Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow HTTP, SSH, and MySQL
+      GroupDescription: Permitir HTTP, SSH y MySQL
       VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -40,7 +48,24 @@ Resources:
           ToPort: 3306
           CidrIp: 0.0.0.0/0
 
-  # ---------- Launch Template for MV1 / MV2 ----------
+  # Public subnets in 2 AZs
+  SubnetAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VpcId
+      AvailabilityZone: !Ref AvailabilityZone1
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+
+  SubnetAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VpcId
+      AvailabilityZone: !Ref AvailabilityZone2
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
+
+  # Launch template for MV1 / MV2 (ms1-4)
   LaunchTemplateMV:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -51,20 +76,16 @@ Resources:
         SecurityGroupIds:
           - !Ref SecurityGroup
         UserData:
-          Fn::Base64: !Sub |
+          Fn::Base64: |
             #!/bin/bash
-            yum update -y
-            yum install -y git docker
-            systemctl enable docker
-            systemctl start docker
-            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
-            cd /home/ec2-user
+            apt-get update -y
+            apt-get install -y git
+            cd /home/ubuntu
             git clone https://github.com/warleon/cloud-computing-project.git
             cd cloud-computing-project
-            docker-compose --profile loadBalanced up -d
+            docker compose --profile loadBalanced up -d
 
-  # ---------- Launch Template for Database ----------
+  # Launch template for Database (MySQL)
   LaunchTemplateDB:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -75,20 +96,16 @@ Resources:
         SecurityGroupIds:
           - !Ref SecurityGroup
         UserData:
-          Fn::Base64: !Sub |
+          Fn::Base64: |
             #!/bin/bash
-            yum update -y
-            yum install -y git docker
-            systemctl enable docker
-            systemctl start docker
-            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
-            cd /home/ec2-user
+            apt-get update -y
+            apt-get install -y git
+            cd /home/ubuntu
             git clone https://github.com/warleon/cloud-computing-project.git
             cd cloud-computing-project
-            docker-compose --profile database up -d
+            docker compose --profile database up -d
 
-  # ---------- Launch Template for Ingesta ----------
+  # Launch template for Ingesta (ms5)
   LaunchTemplateIngesta:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -99,27 +116,23 @@ Resources:
         SecurityGroupIds:
           - !Ref SecurityGroup
         UserData:
-          Fn::Base64: !Sub |
+          Fn::Base64: |
             #!/bin/bash
-            yum update -y
-            yum install -y git docker
-            systemctl enable docker
-            systemctl start docker
-            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
-            cd /home/ec2-user
+            apt-get update -y
+            apt-get install -y git
+            cd /home/ubuntu
             git clone https://github.com/warleon/cloud-computing-project.git
             cd cloud-computing-project
-            docker-compose --profile ingest up -d
+            docker compose --profile ingest up -d
 
-  # ---------- EC2 Instances ----------
+  # EC2 Instances
   InstanceMV1:
     Type: AWS::EC2::Instance
     Properties:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplateMV
         Version: !GetAtt LaunchTemplateMV.LatestVersionNumber
-      SubnetId: !Select [0, !Ref Subnets] # AZ1
+      SubnetId: !Ref SubnetAZ1
 
   InstanceMV2:
     Type: AWS::EC2::Instance
@@ -127,7 +140,7 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplateMV
         Version: !GetAtt LaunchTemplateMV.LatestVersionNumber
-      SubnetId: !Select [1, !Ref Subnets] # AZ2
+      SubnetId: !Ref SubnetAZ2
 
   InstanceDB:
     Type: AWS::EC2::Instance
@@ -135,7 +148,7 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplateDB
         Version: !GetAtt LaunchTemplateDB.LatestVersionNumber
-      SubnetId: !Select [0, !Ref Subnets]
+      SubnetId: !Ref SubnetAZ1
 
   InstanceIngesta:
     Type: AWS::EC2::Instance
@@ -143,14 +156,15 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplateIngesta
         Version: !GetAtt LaunchTemplateIngesta.LatestVersionNumber
-      SubnetId: !Select [1, !Ref Subnets]
+      SubnetId: !Ref SubnetAZ2
 
-  # ---------- Application Load Balancer ----------
+  # Load Balancer
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: MyALB
-      Subnets: !Ref Subnets # attach to multiple subnets (multi-AZ)
+      Subnets:
+        - !Ref SubnetAZ1
+        - !Ref SubnetAZ2
       SecurityGroups:
         - !Ref SecurityGroup
       Scheme: internet-facing
@@ -179,5 +193,5 @@ Resources:
 
 Outputs:
   LoadBalancerDNS:
-    Description: DNS name of the ALB
+    Description: DNS del Load Balancer
     Value: !GetAtt LoadBalancer.DNSName

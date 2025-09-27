@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "CloudFormation: Load Balancer + EC2 (MV1, MV2, DB, Ingesta) running Docker Compose"
+Description: "CloudFormation: ALB + EC2 (MV1, MV2, DB, Ingesta) with Docker Compose"
 
 Parameters:
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
-    Description: Nombre del KeyPair para acceder a las instancias
+    Description: KeyPair name to access the EC2 instances
   InstanceType:
     Type: String
     Default: t3.micro
@@ -12,19 +12,19 @@ Parameters:
       - t2.micro
       - t3.micro
       - t3.small
-    Description: Tipo de instancia EC2
+    Description: EC2 instance type
   VpcId:
     Type: AWS::EC2::VPC::Id
-    Description: VPC existente donde desplegar
+    Description: Existing VPC ID
   Subnets:
     Type: List<AWS::EC2::Subnet::Id>
-    Description: Lista de Subnets públicas para ALB e instancias
+    Description: At least 2 public subnets in different Availability Zones
 
 Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Permitir HTTP, SSH, y MySQL
+      GroupDescription: Allow HTTP, SSH, and MySQL
       VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -40,7 +40,7 @@ Resources:
           ToPort: 3306
           CidrIp: 0.0.0.0/0
 
-  # Launch template for MV1 / MV2 (ms1-4)
+  # ---------- Launch Template for MV1 / MV2 ----------
   LaunchTemplateMV:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -64,7 +64,7 @@ Resources:
             cd cloud-computing-project
             docker-compose --profile loadBalanced up -d
 
-  # Launch template for Database (MySQL)
+  # ---------- Launch Template for Database ----------
   LaunchTemplateDB:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -88,7 +88,7 @@ Resources:
             cd cloud-computing-project
             docker-compose --profile database up -d
 
-  # Launch template for Ingesta (ms5)
+  # ---------- Launch Template for Ingesta ----------
   LaunchTemplateIngesta:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -112,14 +112,14 @@ Resources:
             cd cloud-computing-project
             docker-compose --profile ingest up -d
 
-  # Instances for MV1 and MV2
+  # ---------- EC2 Instances ----------
   InstanceMV1:
     Type: AWS::EC2::Instance
     Properties:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplateMV
         Version: !GetAtt LaunchTemplateMV.LatestVersionNumber
-      SubnetId: !Select [0, !Ref Subnets]
+      SubnetId: !Select [0, !Ref Subnets] # AZ1
 
   InstanceMV2:
     Type: AWS::EC2::Instance
@@ -127,9 +127,8 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref LaunchTemplateMV
         Version: !GetAtt LaunchTemplateMV.LatestVersionNumber
-      SubnetId: !Select [1, !Ref Subnets]
+      SubnetId: !Select [1, !Ref Subnets] # AZ2
 
-  # Database instance
   InstanceDB:
     Type: AWS::EC2::Instance
     Properties:
@@ -138,7 +137,6 @@ Resources:
         Version: !GetAtt LaunchTemplateDB.LatestVersionNumber
       SubnetId: !Select [0, !Ref Subnets]
 
-  # Ingesta instance
   InstanceIngesta:
     Type: AWS::EC2::Instance
     Properties:
@@ -147,11 +145,12 @@ Resources:
         Version: !GetAtt LaunchTemplateIngesta.LatestVersionNumber
       SubnetId: !Select [1, !Ref Subnets]
 
+  # ---------- Application Load Balancer ----------
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: MyALB
-      Subnets: !Ref Subnets
+      Subnets: !Ref Subnets # attach to multiple subnets (multi-AZ)
       SecurityGroups:
         - !Ref SecurityGroup
       Scheme: internet-facing
@@ -180,5 +179,5 @@ Resources:
 
 Outputs:
   LoadBalancerDNS:
-    Description: DNS del Load Balancer
+    Description: DNS name of the ALB
     Value: !GetAtt LoadBalancer.DNSName

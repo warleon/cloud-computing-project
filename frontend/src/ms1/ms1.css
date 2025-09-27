@@ -1,24 +1,124 @@
-:root{
-  --primary-blue:#1e40af;--primary-dark:#1e3a8a;--primary-light:#3b82f6;--gold:#f59e0b;--bg:#f9fafb;--muted:#6b7280
+:root {
+  --primary-blue: #1e40af;
+  --primary-dark: #1e3a8a;
+  --primary-light: #3b82f6;
+  --gold: #f59e0b;
+  --bg: #f9fafb;
+  --muted: #6b7280;
 }
-*{box-sizing:border-box}
-body{font-family:Segoe UI,Segoe,Roboto,Arial,sans-serif;background:var(--bg);color:#111}
-.ms1-container{display:flex;min-height:100vh}
-.ms1-sidebar{width:260px;background:#fff;border-right:1px solid #e5e7eb;padding:20px}
-.ms1-content{flex:1;padding:24px}
-.ms1-nav{height:70px;background:linear-gradient(135deg,var(--primary-blue),var(--primary-dark));color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px}
-.stat-card{background:#fff;padding:16px;border-left:4px solid var(--primary-blue);border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,0.04)}
-.table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.04)}
-.table th,.table td{padding:12px;text-align:left;border-bottom:1px solid #f3f4f6}
-.btn{padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
-.btn-primary{background:var(--primary-blue);color:#fff}
-.btn-secondary{background:#6b7280;color:#fff}
-.search-row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center}
-.modal{background:#fff;padding:18px;border-radius:8px;max-width:640px;width:100%}
-.status-badge{padding:6px 8px;border-radius:6px;font-weight:600}
-.status-badge.approved{background:#ecfdf5;color:#065f46}
-.status-badge.pending{background:#fffbeb;color:#92400e}
-.status-badge.rejected{background:#fff1f2;color:#991b1b}
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: Segoe UI, Segoe, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: #111;
+}
+.ms1-container {
+  display: flex;
+  min-height: 100vh;
+}
+.ms1-sidebar {
+  width: 260px;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  padding: 20px;
+}
+.ms1-content {
+  flex: 1;
+  padding: 24px;
+}
+.ms1-nav {
+  height: 70px;
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-dark));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: #fff;
+  padding: 16px;
+  border-left: 4px solid var(--primary-blue);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
+}
+.table th,
+.table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+}
+.btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--primary-blue);
+  color: #fff;
+}
+.btn-secondary {
+  background: #6b7280;
+  color: #fff;
+}
+.search-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal {
+  background: #fff;
+  padding: 18px;
+  border-radius: 8px;
+  max-width: 640px;
+  width: 100%;
+}
+.status-badge {
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.status-badge.approved {
+  background: #ecfdf5;
+  color: #065f46;
+}
+.status-badge.pending {
+  background: #fffbeb;
+  color: #92400e;
+}
+.status-badge.rejected {
+  background: #fff1f2;
+  color: #991b1b;
+}

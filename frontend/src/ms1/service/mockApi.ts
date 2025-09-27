@@ -6,7 +6,22 @@ export type Stats = {
 };
 
 export async function getStats(): Promise<Stats> {
-  // simple mock - in future wire to real API
+  // Try real API first, fallback to mock
+  try {
+    const res = await fetch('http://localhost:3000/api/customers/health');
+    if (res.ok) {
+      const json = await res.json();
+      return {
+        total: json?.data?.total || 0,
+        active: json?.data?.active || 0,
+        pending: json?.data?.pending || 0,
+        accounts: json?.data?.accounts || 0,
+      } as Stats;
+    }
+  } catch (e) {
+    // ignore and return mock
+  }
+
   return new Promise<Stats>((resolve) =>
     setTimeout(
       () =>
@@ -25,6 +40,19 @@ export type Customer = {
 };
 
 export async function listCustomers(): Promise<Customer[]> {
+  // Try to fetch from backend, fallback to mock
+  try {
+    const res = await fetch('http://localhost:3000/api/customers');
+    if (res.ok) {
+      const json = await res.json();
+      // backend returns { success, data: [...] }
+      const list = json?.data || json || [];
+      return list.map((c: any) => ({ id: c.id || c._id, name: `${c.firstName || ''} ${c.lastName || ''}`.trim(), email: c.email, phone: c.phone, compliance: c.complianceStatus }));
+    }
+  } catch (e) {
+    // ignore and fallback to mock
+  }
+
   return new Promise<Customer[]>((resolve) =>
     setTimeout(
       () =>

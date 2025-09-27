@@ -147,6 +147,8 @@ services:
 
 volumes:
   mysql-data:
+  mongodb_data:
+    driver: local
 
 networks:
   ms4:

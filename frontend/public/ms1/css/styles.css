@@ -1,0 +1,22 @@
+/* Banking Theme CSS - migrated from MS1/public/css/styles.css (trimmed) */
+:root {
+    --primary-blue: #1e40af;
+    --primary-dark: #1e3a8a;
+    --primary-light: #3b82f6;
+    --gold-accent: #f59e0b;
+    --success-green: #10b981;
+    --white: #ffffff;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f9fafb; color:#111827; }
+.navbar { background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%); box-shadow:0 10px 15px rgba(0,0,0,0.1); height:70px; }
+.nav-container { display:flex; align-items:center; justify-content:space-between; padding:0 20px; height:100%; }
+.nav-brand { color:var(--white); font-weight:700; display:flex; align-items:center; gap:8px; }
+.nav-menu { display:flex; gap:12px; }
+.nav-item { color:var(--white); text-decoration:none; padding:8px 12px; border-radius:6px; }
+.main-container { display:flex; margin-top:70px; }
+.sidebar { width:280px; background:white; border-right:1px solid #e5e7eb; padding:20px; }
+.content-area { flex:1; padding:24px; }
+.stat-card { background:white; padding:16px; border-left:4px solid var(--primary-blue); border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.06); }
+.status-indicator { width:12px; height:12px; border-radius:50%; background:#cbd5e1; }
+/* trimmed: original file is large; include core styles required by migrated pages */

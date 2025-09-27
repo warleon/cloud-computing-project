@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Portal Bancario - BankCloud</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-bank bg-gray-50 min-h-screen">
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-bank-blue rounded-lg flex items-center justify-center">
+                    <i class="fas fa-university text-white text-sm"></i>
+                </div>
+                <span class="text-xl font-bold text-gray-900">BankCloud</span>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#dashboard" class="nav-link active nav-item" data-view="dashboard">Inicio</a>
+                <a href="#accounts" class="nav-link nav-item" data-view="accounts">Mis Cuentas</a>
+                <a href="#profile" class="nav-link nav-item" data-view="profile">Mi Perfil</a>
+                <a href="#transactions" class="nav-link nav-item" data-view="transactions">Movimientos</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <button class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2">
+                    <div class="w-8 h-8 bg-bank-blue rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-medium" id="user-avatar">JP</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <p class="text-sm font-medium text-gray-900" id="user-name">Juan Pérez</p>
+                        <p class="text-xs text-gray-500">Cliente Premium</p>
+                    </div>
+                    <button id="logoutBtn" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div id="dashboard-view" class="view active">
+            <div class="mb-8">
+                <div class="bg-gradient-to-r from-bank-blue to-bank-dark rounded-2xl p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-2xl font-bold mb-2">¡Hola, <span id="welcome-name">Juan</span>!</h1>
+                            <p class="text-blue-100">Bienvenido a tu portal bancario personal</p>
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="text-right">
+                                <p class="text-blue-100 text-sm">Último acceso</p>
+                                <p class="text-white font-medium" id="last-access">Hoy, 10:30 AM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-card p-6 hover:shadow-card-hover transition-shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-wallet text-green-600"></i>
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-1">Balance Total</h3>
+                        <p class="text-2xl font-bold text-gray-900" id="total-balance">€••••••</p>
+                        <p class="text-sm text-green-600 flex items-center mt-2">
+                            <i class="fas fa-arrow-up text-xs mr-1"></i>
+                            +2.5% este mes
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+            <span>Cargando...</span>
+        </div>
+    </div>
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="./customer-app.js"></script>
+</body>
+</html>

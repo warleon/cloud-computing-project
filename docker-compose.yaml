@@ -3,13 +3,49 @@ services:
     build:
       context: ./cloud-computing-project-ms-1
       dockerfile: Dockerfile
-    image: warleon/cloud-computing-project-ms-1:latest
+    image: dynast4/cloud-computing-project-ms-1:latest
     container_name: ms1
     ports:
-      - "5001:3000" # adjust ports as needed
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGODB_URI=${MONGODB_URI}
+      - MS2_ACCOUNTS_URL=${MS2_ACCOUNTS_URL}
+      - MS4_COMPLIANCE_URL=${MS4_COMPLIANCE_URL}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS}
+    depends_on:
+      - mongodb
+    networks:
+      - microservices-network
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     profiles:
       - ms1
       - loadBalanced
+
+  mongodb:
+    image: mongo:7-jammy
+    container_name: ms1-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+      - MONGO_INITDB_DATABASE=customer_service_db
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - microservices-network
+    restart: unless-stopped
 
   ms2:
     build:

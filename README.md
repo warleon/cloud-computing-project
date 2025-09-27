@@ -146,7 +146,7 @@ Focus: **KYC/AML checks, fraud prevention, regulatory rules**
 - **Key Functions:**
 
   - Validate transaction (`POST /validateTransaction`) → check if source/destination is sanctioned, if amount exceeds threshold, if unusual behavior.
-  - Risk scoring (`GET /riskScore/{customerId}`) → assign risk profiles to customers.
+  - (Risk scoring removed)
 
 - **Business Rules:**
 

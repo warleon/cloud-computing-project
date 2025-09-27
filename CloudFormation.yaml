@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Load Balancer con 4 EC2 (Cloud9 AMI), 2 instancias en Target Group"
+Description: "CloudFormation: Load Balancer + EC2 (MV1, MV2, DB, Ingesta) running Docker Compose"
 
 Parameters:
   KeyName:
@@ -24,7 +24,7 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Permitir HTTP y SSH
+      GroupDescription: Permitir HTTP, SSH, y MySQL
       VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -35,55 +35,116 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0
 
-  LaunchTemplate:
+  # Launch template for MV1 / MV2 (ms1-4)
+  LaunchTemplateMV:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateData:
         InstanceType: !Ref InstanceType
         KeyName: !Ref KeyName
-        ImageId: ami-0c11b26d # <-- Reemplazar con la AMI de Cloud9 válida en tu región
+        ImageId: ami-092c1558140ceb19d
         SecurityGroupIds:
           - !Ref SecurityGroup
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash
             yum update -y
-            yum install -y git
+            yum install -y git docker
+            systemctl enable docker
+            systemctl start docker
+            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
             cd /home/ec2-user
-            git clone https://github.com/tu-usuario/tu-repo.git
-            echo "Instancia lista" > /home/ec2-user/status.txt
+            git clone https://github.com/warleon/cloud-computing-project.git
+            cd cloud-computing-project
+            docker-compose --profile loadBalanced up -d
 
-  Instance1:
+  # Launch template for Database (MySQL)
+  LaunchTemplateDB:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        InstanceType: !Ref InstanceType
+        KeyName: !Ref KeyName
+        ImageId: ami-092c1558140ceb19d
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install -y git docker
+            systemctl enable docker
+            systemctl start docker
+            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+            cd /home/ec2-user
+            git clone https://github.com/warleon/cloud-computing-project.git
+            cd cloud-computing-project
+            docker-compose --profile database up -d
+
+  # Launch template for Ingesta (ms5)
+  LaunchTemplateIngesta:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        InstanceType: !Ref InstanceType
+        KeyName: !Ref KeyName
+        ImageId: ami-092c1558140ceb19d
+        SecurityGroupIds:
+          - !Ref SecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install -y git docker
+            systemctl enable docker
+            systemctl start docker
+            curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+            cd /home/ec2-user
+            git clone https://github.com/warleon/cloud-computing-project.git
+            cd cloud-computing-project
+            docker-compose --profile ingest up -d
+
+  # Instances for MV1 and MV2
+  InstanceMV1:
     Type: AWS::EC2::Instance
     Properties:
       LaunchTemplate:
-        LaunchTemplateId: !Ref LaunchTemplate
-        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref LaunchTemplateMV
+        Version: !GetAtt LaunchTemplateMV.LatestVersionNumber
       SubnetId: !Select [0, !Ref Subnets]
 
-  Instance2:
+  InstanceMV2:
     Type: AWS::EC2::Instance
     Properties:
       LaunchTemplate:
-        LaunchTemplateId: !Ref LaunchTemplate
-        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref LaunchTemplateMV
+        Version: !GetAtt LaunchTemplateMV.LatestVersionNumber
       SubnetId: !Select [1, !Ref Subnets]
 
-  Instance3:
+  # Database instance
+  InstanceDB:
     Type: AWS::EC2::Instance
     Properties:
       LaunchTemplate:
-        LaunchTemplateId: !Ref LaunchTemplate
-        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref LaunchTemplateDB
+        Version: !GetAtt LaunchTemplateDB.LatestVersionNumber
       SubnetId: !Select [0, !Ref Subnets]
 
-  Instance4:
+  # Ingesta instance
+  InstanceIngesta:
     Type: AWS::EC2::Instance
     Properties:
       LaunchTemplate:
-        LaunchTemplateId: !Ref LaunchTemplate
-        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref LaunchTemplateIngesta
+        Version: !GetAtt LaunchTemplateIngesta.LatestVersionNumber
       SubnetId: !Select [1, !Ref Subnets]
 
   LoadBalancer:
@@ -96,7 +157,7 @@ Resources:
       Scheme: internet-facing
       Type: application
 
-  TargetGroup:
+  TargetGroupMV:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       VpcId: !Ref VpcId
@@ -104,8 +165,8 @@ Resources:
       Protocol: HTTP
       TargetType: instance
       Targets:
-        - Id: !Ref Instance1
-        - Id: !Ref Instance2
+        - Id: !Ref InstanceMV1
+        - Id: !Ref InstanceMV2
 
   Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -115,7 +176,7 @@ Resources:
       Protocol: HTTP
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref TargetGroup
+          TargetGroupArn: !Ref TargetGroupMV
 
 Outputs:
   LoadBalancerDNS:

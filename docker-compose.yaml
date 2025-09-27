@@ -9,6 +9,7 @@ services:
       - "5001:3000" # adjust ports as needed
     profiles:
       - ms1
+      - loadBalanced
 
   ms2:
     build:
@@ -19,6 +20,7 @@ services:
     ports:
       - "5002:3000"
     profiles:
+      - loadBalanced
       - ms2
 
   ms3:
@@ -30,6 +32,7 @@ services:
     ports:
       - "5003:3000"
     profiles:
+      - loadBalanced
       - ms3
 
   ms4:
@@ -55,6 +58,7 @@ services:
       retries: 5
       start_period: 30s
     profiles:
+      - loadBalanced
       - ms4
     networks:
       - ms4
@@ -72,6 +76,7 @@ services:
       - "5005:3000"
     profiles:
       - ms5
+      - ingest
 
   mysql:
     image: mysql:8.0
@@ -85,6 +90,7 @@ services:
     profiles:
       - ms4
       - ms4-dev
+      - database
     networks:
       - ms4
     healthcheck:

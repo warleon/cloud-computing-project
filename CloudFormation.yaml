@@ -54,7 +54,7 @@ Resources:
     Properties:
       VpcId: !Ref VpcId
       AvailabilityZone: !Ref AvailabilityZone1
-      CidrBlock: 10.0.1.0/24
+      CidrBlock: 172.31.42.0/24
       MapPublicIpOnLaunch: true
 
   SubnetAZ2:
@@ -62,7 +62,7 @@ Resources:
     Properties:
       VpcId: !Ref VpcId
       AvailabilityZone: !Ref AvailabilityZone2
-      CidrBlock: 10.0.2.0/24
+      CidrBlock: 172.31.69.0/24
       MapPublicIpOnLaunch: true
 
   # Launch template for MV1 / MV2 (ms1-4)

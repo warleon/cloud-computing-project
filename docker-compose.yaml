@@ -1,5 +1,5 @@
 services:
-  ms1:
+  ms1_service:
     build:
       context: ./cloud-computing-project-ms-1
       dockerfile: Dockerfile

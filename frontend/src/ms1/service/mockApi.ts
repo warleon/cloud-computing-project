@@ -8,7 +8,7 @@ export type Stats = {
 export async function getStats(): Promise<Stats> {
   // Try real API first, fallback to mock
   try {
-    const res = await fetch('http://localhost:3000/api/customers/health');
+  const res = await fetch('http://cloud-computing-project-LB-1422038316.us-east-1.elb.amazonaws.com:5001/api/health');
     if (res.ok) {
       const json = await res.json();
       return {
@@ -42,7 +42,7 @@ export type Customer = {
 export async function listCustomers(): Promise<Customer[]> {
   // Try to fetch from backend, fallback to mock
   try {
-    const res = await fetch('http://localhost:3000/api/customers');
+  const res = await fetch('http://cloud-computing-project-LB-1422038316.us-east-1.elb.amazonaws.com:5001/api/customers');
     if (res.ok) {
       const json = await res.json();
       // backend returns { success, data: [...] }

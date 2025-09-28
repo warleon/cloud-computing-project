@@ -6,7 +6,7 @@ services:
     image: dynast4/cloud-computing-project-ms-1:latest
     container_name: ms1
     ports:
-      - "3000:3000"
+      - "5001:3000"
     environment:
       - PORT=3000
       - MONGODB_URI=${MONGODB_URI}

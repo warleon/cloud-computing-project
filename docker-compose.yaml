@@ -94,6 +94,7 @@ services:
     profiles:
       - loadBalanced
       - ms4
+      - ms4-dev
     networks:
       - ms4
     depends_on:
@@ -136,7 +137,7 @@ services:
           "-h",
           "localhost",
           "-uroot",
-          "-p${MYSQL_ROOT_PASSWORD}",
+          "-p${MS4_DB_ROOT_PASSWORD}",
         ]
       interval: 1m30s
       timeout: 30s

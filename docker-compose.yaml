@@ -9,11 +9,11 @@ services:
       - "5001:3000"
     environment:
       - PORT=3000
-      - MONGODB_URI=${MONGODB_URI}
-      - MS2_ACCOUNTS_URL=${MS2_ACCOUNTS_URL}
-      - MS4_COMPLIANCE_URL=${MS4_COMPLIANCE_URL}
-      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS}
-      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS}
+      - MONGODB_URI="${MONGODB_URI}"
+      - MS2_ACCOUNTS_URL="${MS2_ACCOUNTS_URL}"
+      - MS4_COMPLIANCE_URL="${MS4_COMPLIANCE_URL}"
+      - RATE_LIMIT_WINDOW_MS="${RATE_LIMIT_WINDOW_MS}"
+      - RATE_LIMIT_MAX_REQUESTS="${RATE_LIMIT_MAX_REQUESTS}"
     networks:
       - ms1
     restart: unless-stopped
@@ -75,12 +75,12 @@ services:
       dockerfile: Dockerfile
     image: warleon/cloud-computing-project-ms-4:latest
     environment:
-      DB_PASSWORD: ${MS4_DB_ROOT_PASSWORD}
-      DB_NAME: ${MS4_DB_ROOT_DB}
+      DB_PASSWORD: "${MS4_DB_ROOT_PASSWORD}"
+      DB_NAME: "${MS4_DB_ROOT_DB}"
       DB_USER: root
       DB_PORT: 3306
-      DB_HOST: ${MS4_DB_HOST:-mysql}
-      FRAUD_API_URL: ${MS4_PUBLIC_URL:-ms4}
+      DB_HOST: "${MS4_DB_HOST:-mysql}"
+      FRAUD_API_URL: "${MS4_PUBLIC_URL:-ms4}"
       GIN_MODE: release
     container_name: ms4
     ports:
@@ -115,8 +115,8 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ${MS4_DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MS4_DB_ROOT_DB}
+      MYSQL_ROOT_PASSWORD: "${MS4_DB_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MS4_DB_ROOT_DB}"
     ports:
       - "3306:3306"
     volumes:

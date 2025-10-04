@@ -5,11 +5,12 @@ import Navbar from "./ms1/components/Navbar";
 import Sidebar from "./ms1/components/Sidebar";
 import Dashboard from "./ms1/pages/Dashboard";
 import Customers from "./ms1/pages/Customers";
+import RulesPage from "./ms4/pages/Rules";
 
 export default function App() {
-  const [view, setView] = useState<"dashboard" | "customers" | "reports">(
-    "dashboard"
-  );
+  const [view, setView] = useState<
+    "dashboard" | "customers" | "reports" | "rules"
+  >("dashboard");
   return (
     <div>
       <Navbar />
@@ -24,6 +25,7 @@ export default function App() {
               <p>Próximamente</p>
             </div>
           )}
+          {view === "rules" && <RulesPage />}
         </main>
       </div>
     </div>

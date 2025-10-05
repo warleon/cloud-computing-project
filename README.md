@@ -197,3 +197,5 @@ Focus: **Business Intelligence, regulatory reports, dashboards**
    - SPA → MS5 (`GET /reports/transactions`) → Athena queries aggregated transaction data.
 
 ---
+
+# Deployment Diagram

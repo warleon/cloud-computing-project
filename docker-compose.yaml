@@ -40,6 +40,8 @@ services:
     profiles:
       - loadBalanced
       - ms2
+    networks:
+      - ms2
 
   ms3:
     build:
@@ -182,7 +184,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - ms-network
+      - ms2
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ms2 -d ms2_accounts"]
       interval: 10s
@@ -205,4 +207,6 @@ networks:
   ms4:
     driver: bridge
   ms1:
+    driver: bridge
+  ms2:
     driver: bridge

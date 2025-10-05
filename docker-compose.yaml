@@ -1,5 +1,5 @@
 services:
-  ms1_service:
+  ms1:
     build:
       context: ./cloud-computing-project-ms-1
       dockerfile: Dockerfile
@@ -9,7 +9,7 @@ services:
       - "5001:3000"
     environment:
       - PORT=3000
-      - MONGODB_URI="${MONGODB_URI}"
+      - MONGODB_URI="${MS1_MONGODB_URI}"
       - MS2_ACCOUNTS_URL="${MS2_ACCOUNTS_URL}"
       - MS4_COMPLIANCE_URL="${MS4_COMPLIANCE_URL}"
       - RATE_LIMIT_WINDOW_MS="${RATE_LIMIT_WINDOW_MS}"
@@ -71,7 +71,6 @@ services:
       DB_USER: root
       DB_PORT: 3306
       DB_HOST: "${MS4_DB_HOST:-mysql}"
-      FRAUD_API_URL: "${MS4_PUBLIC_URL:-ms4}"
       GIN_MODE: release
     container_name: ms4
     ports:
@@ -88,9 +87,6 @@ services:
       - ms4-dev
     networks:
       - ms4
-    depends_on:
-      mysql:
-        condition: service_healthy
 
   ms5:
     build:

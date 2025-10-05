@@ -29,22 +29,6 @@ services:
       - ms1
       - loadBalanced
 
-  mongodb:
-    image: mongo:7-jammy
-    container_name: ms1-mongodb
-    ports:
-      - "27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password123
-      - MONGO_INITDB_DATABASE=customer_service_db
-    volumes:
-      - mongodb_data:/data/db
-      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    networks:
-      - ms1
-    restart: unless-stopped
-
   ms2:
     build:
       context: ./cloud-computing-project-ms-2
@@ -165,9 +149,56 @@ services:
       retries: 5
       start_period: 30s
 
+  mongodb:
+    image: mongo:7-jammy
+    container_name: ms1-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MS2_INIT_DB_ROOT_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MS2_INIT_DB_ROOT_PASSWORD:-password123}
+      - MONGO_INITDB_DATABASE=${MS1_DB_NAME:-customer_service_database}
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - ms1
+    restart: unless-stopped
+    profiles:
+      - ms1
+      - ms1-dev
+      - database
+
+  postgres:
+    image: postgres:15
+    container_name: ms2_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${MS2_DB_USER:-ms2}
+      POSTGRES_PASSWORD: ${MS2_DB_PASSWORD:-secret}
+      POSTGRES_DB: ${MS2_DB_NAME:-ms2_accounts}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ms2 -d ms2_accounts"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - ms2
+      - ms2-dev
+      - database
+
 volumes:
   mysql-data:
+    driver: local
   mongodb_data:
+    driver: local
+  postgres_data:
     driver: local
 
 networks:

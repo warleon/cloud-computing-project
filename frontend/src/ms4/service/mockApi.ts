@@ -1,3 +1,6 @@
+const ms4ApiFQDN =
+  "http://cloud-computing-project-LB-1422038316.us-east-1.elb.amazonaws.com:5004";
+
 export type Rule = {
   id: string;
   name: string;
@@ -10,9 +13,7 @@ export type Rule = {
 export async function listRules(): Promise<Rule[]> {
   // Try real API first, fallback to mock
   try {
-    const res = await fetch(
-      "http://cloud-computing-project-LB-1422038316.us-east-1.elb.amazonaws.com:5004/api/rules"
-    );
+    const res = await fetch(`${ms4ApiFQDN}/api/v1/rules`);
     if (res.ok) {
       const json = await res.json();
       const list = json?.data || json || [];

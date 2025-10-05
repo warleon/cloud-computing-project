@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listRules, Rule } from "../service/mockApi";
+import { listRules, ms4ApiFQDN, Rule } from "../service/mockApi";
 
 function Toast({
   items,
@@ -304,14 +304,11 @@ function NewRuleForm({
     }
 
     try {
-      const res = await fetch(
-        "http://cloud-computing-project-LB-1422038316.us-east-1.elb.amazonaws.com:5004/api/rules",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch(`${ms4ApiFQDN}/api/v1/rules`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
       const json = await res.json();
       if (!res.ok) {
         const serverErrors = json?.errors;

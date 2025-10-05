@@ -65,6 +65,11 @@ services:
     container_name: ms3
     ports:
       - "5003:3000"
+    environment:
+      - PORT=3000
+      - MS2_URL="${MS2_URL}"
+      - MS2_SERVICE_KEY="${MS2_SERVICE_KEY}"
+      - MS4_URL="${MS4_URL}"
     profiles:
       - loadBalanced
       - ms3

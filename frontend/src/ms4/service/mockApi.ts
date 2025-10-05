@@ -1,4 +1,4 @@
-const ms4ApiFQDN =
+export const ms4ApiFQDN =
   "http://cloud-computing-project-LB-1422038316.us-east-1.elb.amazonaws.com:5004";
 
 export type Rule = {

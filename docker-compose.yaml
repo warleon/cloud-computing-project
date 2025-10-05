@@ -126,7 +126,7 @@ services:
       MYSQL_ROOT_PASSWORD: "${MS4_DB_ROOT_PASSWORD}"
       MYSQL_DATABASE: "${MS4_DB_ROOT_DB}"
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     profiles:

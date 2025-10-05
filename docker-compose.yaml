@@ -108,15 +108,31 @@ services:
 
   ms5:
     build:
-      context: ./cloud-computing-project-ms-5
+      context: ./cloud-computing-project-ms-5/api-consultas
       dockerfile: Dockerfile
     image: warleon/cloud-computing-project-ms-5:latest
     container_name: ms5
     ports:
-      - "5005:3000"
+      - "5005:8000"
     profiles:
       - ms5
       - ingest
+    environment:
+      # AWS Configuration
+      - AWS_DEFAULT_REGION=${MS5_AWS_DEFAULT_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=${MS5_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${MS5_AWS_SECRET_ACCESS_KEY}
+      - AWS_SESSION_TOKEN=${MS5_AWS_SESSION_TOKEN}
+      # Athena Configuration
+      - ATHENA_DATABASE=${MS5_ATHENA_DATABASE:-datalake_raw}
+      - ATHENA_OUTPUT_LOCATION=${MS5_ATHENA_OUTPUT_LOCATION}
+      - ATHENA_WORKGROUP=${MS5_ATHENA_WORKGROUP:-primary}
+      # API Configuration
+      - API_HOST=${MS5_API_HOST:-0.0.0.0}
+      - API_PORT=${MS5_API_PORT:-8000}
+      - API_RELOAD=${MS5_API_RELOAD:-false}
+      # Logging
+      - LOG_LEVEL=${MS5_LOG_LEVEL:-INFO}
 
   mysql:
     image: mysql:8.0

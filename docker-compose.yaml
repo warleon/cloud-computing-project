@@ -33,59 +33,37 @@ services:
     build:
       context: ./cloud-computing-project-ms-2
       dockerfile: Dockerfile
-    image: efrencenteno/cloud-computing-project-ms-2:latest   
+    image: efrencenteno/cloud-computing-project-ms-2:latest
     container_name: ms2
     ports:
       - "5002:8080"
     environment:
       - APP_PORT=8080
       - PYTHONUNBUFFERED=1
-      - DB_HOST=ms2_postgres
+      - DB_HOST=${MS2_DB_HOST:-postgres}
       - DB_PORT=5432
-      - DB_NAME=ms2_accounts
-      - DB_USER=ms2
-      - DB_PASSWORD=secret
-      - MS1_BASE_URL=http://ms1:3000/api
+      - DB_NAME=${MS2_DB_NAME:-ms2_accounts}
+      - DB_USER=${MS2_DB_USER:-ms2}
+      - DB_PASSWORD=${MS2_DB_PASSWORD:-secret}
+      - MS1_BASE_URL=${MS1_USERS_URL}
       - MS1_VALIDATE=true
       - MS1_TIMEOUT=3
-      - MS3_NOTIFY_ENABLED=true
-      - MS3_NOTIFY_URL=http://ms3:3003/api/v1/balance-updates
-      - MS3_NOTIFY_TIMEOUT=2.5
-      - MS3_NOTIFY_KEY=changeme-ms2-to-ms3
-      - SERVICE_KEY_FOR_MS3=changeme
-      - ALLOWED_ORIGINS=http://localhost:3000,http://34.192.101.95
-      - LOG_LEVEL=info
-    depends_on:
-      - ms2_postgres
-      - ms1_service
+      - SERVICE_KEY_FOR_MS3=${MS2_SERVICE_KEY_FOR_MS3}
+      - ALLOWED_ORIGINS=${MS2_ALLOWED_ORIGINS:-*}
+      - LOG_LEVEL=${MS2_LOG_LEVEL:-INFO}
     networks:
       - ms1
+      - ms2
     restart: unless-stopped
     profiles:
       - loadBalanced
       - ms2
 
-  postgres:
-    image: postgres:16-alpine
-    container_name: ms2_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ms2_accounts
-      POSTGRES_USER: ms2
-      POSTGRES_PASSWORD: secret
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - ms1
-
-
   ms3:
     build:
       context: ./cloud-computing-project-ms-3
       dockerfile: Dockerfile
-    image: warleon/cloud-computing-project-ms-3:latest
+    image: justwarleon/cloud-computing-project-ms-3:latest
     container_name: ms3
     ports:
       - "5003:3000"
@@ -102,7 +80,7 @@ services:
     build:
       context: ./cloud-computing-project-ms-4
       dockerfile: Dockerfile
-    image: warleon/cloud-computing-project-ms-4:latest
+    image: justwarleon/cloud-computing-project-ms-4:latest
     environment:
       DB_PASSWORD: "${MS4_DB_ROOT_PASSWORD}"
       DB_NAME: "${MS4_DB_ROOT_DB}"
@@ -205,7 +183,7 @@ services:
       - ms1-dev
       - database
 
-  ms2_postgres:
+  postgres:
     image: postgres:15
     container_name: ms2_postgres
     restart: unless-stopped

@@ -69,8 +69,8 @@ services:
       - "5003:3000"
     environment:
       - PORT=3000
-      - MS2_URL="${MS2_URL}"
-      - MS2_SERVICE_KEY="${MS2_SERVICE_KEY}"
+      - MS2_URL="${MS2_ACCOUNTS_URL}"
+      - MS2_SERVICE_KEY="${MS2_SERVICE_KEY_FOR_MS3}"
       - MS4_URL="${MS4_COMPLIANCE_URL}"
     profiles:
       - loadBalanced
@@ -85,7 +85,7 @@ services:
       DB_PASSWORD: "${MS4_DB_ROOT_PASSWORD}"
       DB_NAME: "${MS4_DB_ROOT_DB}"
       DB_USER: root
-      DB_PORT: 3306
+      DB_PORT: ${MS4_DB_PORT:-3306}
       DB_HOST: "${MS4_DB_HOST:-mysql}"
       GIN_MODE: release
     container_name: ms4
